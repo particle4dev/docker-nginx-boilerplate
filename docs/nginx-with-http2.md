@@ -1,0 +1,3 @@
+### Setup
+
+> https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-with-http-2-support-on-ubuntu-16-04

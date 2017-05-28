@@ -1,0 +1,30 @@
+version: "2"
+
+services:
+  nginx:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ${PWD}/sites-enabled:/etc/nginx/sites-enabled:rw
+      - ${PWD}/sites-available:/etc/nginx/sites-available:rw
+      - ${PWD}/www:/data/www:rw
+      - ${PWD}/nginx-logs:/var/log/nginx
+      - ${PWD}/nginx-cache:/tmp/nginx/cache
+      - ${PWD}/nginx.conf:/etc/nginx/nginx.conf
+      # - /etc/letsencrypt/archive/media.cityme.vn/fullchain2.pem:/etc/nginx/fullchain.pem
+      # - /etc/letsencrypt/archive/media.cityme.vn/privkey2.pem:/etc/nginx/privkey.pem
+
+    env_file:
+      - ./common.env
+    networks:
+      - front-tier
+    container_name: nginx
+    # command: tail -f /dev/null
+    ports:
+      - "80:80"
+      - "443:443"
+
+networks:
+  back-tier:
+  front-tier:
