@@ -27,7 +27,7 @@ server {
 
   # Sets configuration depending on a request URI.
 
-  #more_set_headers 'Server: cityme';
+  more_set_headers 'Server: ant-solution-fw';
 
   location / {
     proxy_set_header X-Real-IP $remote_addr;

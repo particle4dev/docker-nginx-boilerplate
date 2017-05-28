@@ -26,6 +26,25 @@ RUN \
     ca-certificates \
     openssl
 
+RUN \
+  curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -o nginx.tar.gz \
+  && curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz.asc  -o nginx.tar.gz.asc \
+  && export GNUPGHOME="$(mktemp -d)" \
+  && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPG_KEYS" \
+  && gpg --batch --verify nginx.tar.gz.asc nginx.tar.gz \
+  && rm -r "$GNUPGHOME" nginx.tar.gz.asc \
+  && mkdir -p /usr/src \
+  && tar -zxC /usr/src -f nginx.tar.gz \
+  && rm nginx.tar.gz
+
+# add third party modules
+ENV headers_more_nginx_module 0.32
+RUN \
+  wget -O v$headers_more_nginx_module.tar.gz https://github.com/openresty/headers-more-nginx-module/archive/v$headers_more_nginx_module.tar.gz \
+  && mkdir -p /usr/lib/nginx/modules \
+  && tar -zxC /usr/lib/nginx/modules/ -f v$headers_more_nginx_module.tar.gz \
+  && rm -f v$headers_more_nginx_module.tar.gz
+
 ENV CONFIG "\
   --prefix=/etc/nginx \
   --sbin-path=/usr/sbin/nginx \
@@ -68,19 +87,11 @@ ENV CONFIG "\
   --with-file-aio \
   --with-http_v2_module \
   --with-ipv6 \
+  --add-dynamic-module=/usr/lib/nginx/modules/headers-more-nginx-module-$headers_more_nginx_module \
   "
 
-RUN \
-  curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -o nginx.tar.gz \
-  && curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz.asc  -o nginx.tar.gz.asc \
-  && export GNUPGHOME="$(mktemp -d)" \
-  && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPG_KEYS" \
-  && gpg --batch --verify nginx.tar.gz.asc nginx.tar.gz \
-  && rm -r "$GNUPGHOME" nginx.tar.gz.asc \
-  && mkdir -p /usr/src \
-  && tar -zxC /usr/src -f nginx.tar.gz \
-  && rm nginx.tar.gz \
-  && cd /usr/src/nginx-$NGINX_VERSION \
+ RUN \
+  cd /usr/src/nginx-$NGINX_VERSION \
   && ./configure $CONFIG --with-debug \
   && make \
   && mv objs/nginx objs/nginx-debug \
