@@ -6,6 +6,7 @@ services:
       context: ./
       dockerfile: Dockerfile
     volumes:
+      - ${PWD}/boilerplate:/etc/nginx/boilerplate:rw
       - ${PWD}/sites-enabled:/etc/nginx/sites-enabled:rw
       - ${PWD}/sites-available:/etc/nginx/sites-available:rw
       - ${PWD}/www:/data/www:rw
