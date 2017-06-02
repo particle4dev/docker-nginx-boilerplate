@@ -137,6 +137,12 @@ RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/
 # remove packages
 RUN apk del .build-deps
 
+COPY boilerplate /etc/nginx/boilerplate
+COPY sites-enabled /etc/nginx/sites-enabled
+COPY sites-available /etc/nginx/sites-available
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY www /data/www
+
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
